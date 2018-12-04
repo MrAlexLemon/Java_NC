@@ -41,8 +41,8 @@ public class FillArrays {
     }
 }
 */
-@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
 public @interface DescFill
 {
     String name(); //The command for which the function will answer
