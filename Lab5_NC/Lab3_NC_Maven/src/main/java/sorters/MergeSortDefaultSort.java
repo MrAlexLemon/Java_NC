@@ -9,56 +9,7 @@ package sorters;
  * @version 1.3
  */
 public class MergeSortDefaultSort extends AbstarctSorter {
-    private DefaultSort bs= new DefaultSort();
-    //private FillArray fa = new RandomFillArray(7,100);
 
-    /**
-     * <p>Use hybrid. Merge sort + DefaultSort</p>
-     * @param arr - start array
-     * @param l - left border
-     * @param r - right border
-     * <pre>{@code
-     *          private void sortMerge1(int[] arr, int l, int r) {
-     *
-     *         if (Math.abs(l - r) < arr.length / 2) { //use bubble sort when array size<half
-     *             arr=bs.sort(arr);
-     *         }
-     *         //if (l < r) {
-     *         else {
-     *             // Find the middle point
-     *             int m = (l + r) / 2;
-     *
-     *             // Sort first and second halves
-     *             sortMerge1(arr, l, m);
-     *             sortMerge1(arr, m + 1, r);
-     *
-     *             // Merge the sorted halves
-     *             merge(arr, l, m, r);
-     *         }
-     *
-     *     }
-     * }
-     * </pre>
-     */
-    private void sortMerge1(int[] arr, int l, int r) {
-
-        if (Math.abs(l - r) <= arr.length / 2) { //use bubble sort when array size<half
-            arr=bs.sort(arr);
-        }
-        //if (l < r) {
-        else {
-            // Find the middle point
-            int m = (l + r) / 2;
-
-            // Sort first and second halves
-            sortMerge1(arr, l, m);
-            sortMerge1(arr, m + 1, r);
-
-            // Merge the sorted halves
-            merge(arr, l, m, r);
-        }
-
-    }
 
     /**
      * <p>This method sort array using MergeSortDefaultSort</p>
@@ -67,10 +18,18 @@ public class MergeSortDefaultSort extends AbstarctSorter {
      * {@link sorters.AbstarctSorter#sort(int[])}
      * <pre>{@code
      * public int[] sort(int[] arr) {
-     *         //int[] arr= obj.fillArray();
+     *    if (arr.length == 0)
+     *          throw new IllegalArgumentException();
      *
-     *         sortMerge1(arr, 0, arr.length-1);
-     *
+     *    int[] temp=new int[0];
+     *         try {
+     *              temp=tempSort(arr);
+     *         }
+     *         catch (Exception ex)
+     *         {
+     *             ex.printStackTrace();
+     *         }
+     *         System.arraycopy (temp, 0, arr, 0, arr.length);
      *         return arr;
      *     }
      * }
@@ -82,13 +41,51 @@ public class MergeSortDefaultSort extends AbstarctSorter {
             desc = "Sort array using MergeSortDefaultSort",
             aliases = {""})
     public int[] sort(int[] arr) {
-        //int[] arr= obj.fillArray();
 
         if (arr.length == 0)
             throw new IllegalArgumentException();
 
-        sortMerge1(arr, 0, arr.length-1);
-
+        int[] temp=new int[0];
+        try {
+            temp=tempSort(arr);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        System.arraycopy (temp, 0, arr, 0, arr.length);
         return arr;
+    }
+
+
+    /**
+     * <p>This method sort array using MergeSortDefaultSort</p>
+     * @param arr - start array
+     * @return int[] - sorted array
+     */
+    public int[] tempSort(int[] arr) throws InterruptedException{
+        long threadCount = Math.round(-(1 - Math.pow(2, 1)));
+        int[] tempArr;//=new int[0];
+        if(Runtime.getRuntime().availableProcessors()>=threadCount) {
+            int[] subArr1 = new int[arr.length / 2];
+            int[] subArr2 = new int[arr.length - arr.length / 2];
+            System.arraycopy(arr, 0, subArr1, 0, arr.length / 2);
+            System.arraycopy(arr, arr.length / 2, subArr2, 0, arr.length - arr.length / 2);
+
+            MergeSort runner1 = new MergeSort(subArr1);
+            MergeSort runner2 = new MergeSort(subArr2);
+            runner1.start();
+            runner2.start();
+            runner1.join();
+            runner2.join();
+
+            tempArr=finalMerge(runner1.getInternal(), runner2.getInternal());
+        }
+        else{
+            DefaultSort bsd = new DefaultSort();
+            bsd.sort(arr);
+            tempArr=arr;
+        }
+        return  tempArr;
     }
 }
