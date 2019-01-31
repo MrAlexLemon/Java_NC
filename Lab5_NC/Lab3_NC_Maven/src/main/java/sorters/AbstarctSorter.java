@@ -7,7 +7,7 @@ package sorters;
  * @author Khomenko Olexandr
  * @version 1.3
  */
-public abstract class AbstarctSorter {
+public abstract class AbstarctSorter{
 
     /**
      * <p>This method sort array using different sorters</p>
@@ -80,65 +80,48 @@ public abstract class AbstarctSorter {
         return i + 1;
     }
 
+
     /**
-     * <p>Merge small arrays into big.</p>
-     * @param arr - start array
-     * @param l - left border
-     * @param m - middle
-     * @param r - right border
-     * @see AbstarctSorter#merge(int[],int,int,int)
+     * <p>Merge 2 sorted arrays.</p>
+     * @param a - array sorted in 1 thread
+     * @param b - array sorted in 2 thread
+     * @return int[] result - sorted array
+     * @see AbstarctSorter#finalMerge(int[] a, int[] b)
      */
-    @Description(name = "merge",
-            args = "int[] arr, int l, int m, int r. l-left border, m -middle, r-right border",
-            desc = "Merge small arrays into big",
-            aliases = {""})
-    protected void merge(int[] arr, int l, int m, int r) {
-        // Find sizes of two subarrays to be merged
-        int n1 = m - l + 1;
-        int n2 = r - m;
-
-        /* Create temp arrays */
-        int L[] = new int[n1];
-        int R[] = new int[n2];
-
-        /*Copy data to temp arrays*/
-        for (int i = 0; i < n1; ++i)
-            L[i] = arr[l + i];
-        for (int j = 0; j < n2; ++j)
-            R[j] = arr[m + 1 + j];
-
-
-        /* Merge the temp arrays */
-
-        // Initial indexes of first and second subarrays
-        int i = 0, j = 0;
-
-        // Initial index of merged subarry array
-        int k = l;
-        while (i < n1 && j < n2) {
-            if (L[i] <= R[j]) {
-                arr[k] = L[i];
+    public int[] finalMerge(int[] a, int[] b) {
+        int[] result = new int[a.length + b.length];
+        int i=0;
+        int j=0;
+        int r=0;
+        while (i < a.length && j < b.length) {
+            if (a[i] <= b[j]) {
+                result[r]=a[i];
                 i++;
+                r++;
             } else {
-                arr[k] = R[j];
+                result[r]=b[j];
                 j++;
+                r++;
             }
-            k++;
+            if (i==a.length) {
+                while (j<b.length) {
+                    result[r]=b[j];
+                    r++;
+                    j++;
+                }
+            }
+            if (j==b.length) {
+                while (i<a.length) {
+                    result[r]=a[i];
+                    r++;
+                    i++;
+                }
+            }
         }
 
-        /* Copy remaining elements of L[] if any */
-        while (i < n1) {
-            arr[k] = L[i];
-            i++;
-            k++;
-        }
 
-        /* Copy remaining elements of R[] if any */
-        while (j < n2) {
-            arr[k] = R[j];
-            j++;
-            k++;
-        }
+        return result;
     }
+
 
 }
